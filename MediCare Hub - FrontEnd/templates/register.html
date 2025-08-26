@@ -1,0 +1,239 @@
+<!-- File: templates/register.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Medicare Hub — Create Account</title>
+
+  <!-- favicon placeholder (replace with /static/images/favicon.ico) -->
+  <!-- <link rel="icon" href="{% static 'images/favicon.ico' %}"> -->
+
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <header class="site-header" role="banner">
+    <div class="site-brand">
+      <!-- Replace with your logo: /static/images/logo.png -->
+      <!-- <img src="/static/images/logo.png" alt="Medicare Hub"> -->
+      <svg class="logo-svg" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#0d6efd"/>
+            <stop offset="1" stop-color="#0ec2b6"/>
+          </linearGradient>
+        </defs>
+        <rect rx="10" width="64" height="64" fill="url(#g2)"/>
+        <g transform="translate(10,8)" fill="#fff">
+          <circle cx="11" cy="9" r="3.8"/>
+          <rect x="8" y="18" width="6" height="18" rx="3"/>
+          <path d="M30 10c0 5-8 8-8 8" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </g>
+      </svg>
+
+      <span class="brand-name">Medicare Hub</span>
+    </div>
+  </header>
+
+  <main class="auth-page" role="main">
+    <section class="auth-card" aria-labelledby="register-title">
+      <!-- Left panel: Branding & benefits -->
+      <div class="auth-left" aria-hidden="false">
+        <div class="left-inner">
+          <h1 class="welcome">Create your Medicare Hub account</h1>
+          <p class="lead">Securely manage patients, appointments, and records — designed for doctors.</p>
+
+          <figure class="illustration" aria-hidden="true">
+            <svg viewBox="0 0 220 220" class="illu-svg" focusable="false">
+              <defs>
+                <radialGradient id="rg2" cx="30%" cy="30%">
+                  <stop offset="0%" stop-color="#f0fffb"/>
+                  <stop offset="100%" stop-color="#eef9f7"/>
+                </radialGradient>
+              </defs>
+              <circle cx="110" cy="110" r="110" fill="url(#rg2)"/>
+              <g transform="translate(40,36)" fill="none" stroke="#0b7285" stroke-linecap="round" stroke-linejoin="round" stroke-width="6">
+                <path d="M64 14 C64 40, 24 40, 24 66" />
+                <path d="M24 66 C20 98, 40 110, 64 110 C88 110, 108 98, 104 66" />
+                <circle cx="64" cy="20" r="10" fill="#0b7285"/>
+                <rect x="88" y="82" width="20" height="28" rx="6" fill="#0b7285"/>
+              </g>
+            </svg>
+          </figure>
+
+          <ul class="left-features">
+            <li>Encrypted patient records</li>
+            <li>Easy appointment scheduling</li>
+            <li>HIPAA-friendly UI (integrate on backend)</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Right panel: Registration form -->
+      <div class="auth-right">
+        <div class="form-wrap">
+          <h2 id="register-title">Create account</h2>
+
+          <!-- Non-field error area (Django) -->
+          <div class="form-error" role="alert" aria-live="polite" hidden>
+            <!-- {{ form.non_field_errors }} -->
+          </div>
+
+          <form method="post" action="#" class="login-form" autocomplete="on" novalidate>
+            <!-- Insert Django CSRF token here -->
+            <!-- csrf_token will come here -->
+
+            <!-- Full name -->
+            <div class="field">
+              <label for="id_fullname">Full name</label>
+              <!-- {{ form.full_name }} -->
+              <input
+                id="id_fullname"
+                name="full_name"
+                type="text"
+                placeholder="Dr. A. Example"
+                required
+                maxlength="100"
+                aria-required="true"
+                aria-describedby="fullname-help"
+              />
+              <small id="fullname-help" class="field-help">Use your professional name (what patients will see).</small>
+
+              <!-- Per-field error comment (replace with Django error display) -->
+              <!-- {{ form.full_name.errors }} -->
+            </div>
+
+            <!-- Email -->
+            <div class="field">
+              <label for="id_email">Email</label>
+              <!-- {{ form.email }} -->
+              <input
+                id="id_email"
+                name="email"
+                type="email"
+                placeholder="you@hospital.com"
+                required
+                maxlength="254"
+                autocomplete="email"
+                aria-required="true"
+                aria-describedby="email-help"
+              />
+              <small id="email-help" class="field-help">We'll send a verification link to this email.</small>
+              <!-- {{ form.email.errors }} -->
+            </div>
+
+            <!-- Username (optional) -->
+            <div class="field">
+              <label for="id_username">Username (optional)</label>
+              <input
+                id="id_username"
+                name="username"
+                type="text"
+                placeholder="unique username (letters/numbers)"
+                maxlength="150"
+                aria-describedby="username-help"
+              />
+              <small id="username-help" class="field-help">Leave blank to use your email as username.</small>
+              <!-- {{ form.username.errors }} -->
+            </div>
+
+            <!-- Role selection -->
+            <div class="field">
+              <label for="id_role">Account type</label>
+              <select id="id_role" name="role" required aria-required="true">
+                <!-- On backend, validate and show/hide role-specific fields. -->
+                <option value="doctor" selected>Doctor</option>
+                <option value="patient">Patient</option>
+              </select>
+              <small class="field-help">Choose the account type. Doctors should provide license details below.</small>
+              <!-- {{ form.role.errors }} -->
+            </div>
+
+            <!-- Medical license (optional but recommended for doctors) -->
+            <div class="field">
+              <label for="id_license">Medical license number (optional)</label>
+              <input
+                id="id_license"
+                name="license_number"
+                type="text"
+                placeholder="License or registration number"
+                maxlength="60"
+                aria-describedby="license-help"
+              />
+              <small id="license-help" class="field-help">Provide registration/licence for hospital verification (if available).</small>
+              <!-- {{ form.license_number.errors }} -->
+            </div>
+
+            <!-- Password -->
+            <div class="field">
+              <label for="id_password1">Password</label>
+              <!-- {{ form.password1 }} -->
+              <input
+                id="id_password1"
+                name="password1"
+                type="password"
+                placeholder="Create a strong password"
+                required
+                minlength="8"
+                aria-required="true"
+                aria-describedby="pwd-help"
+                autocomplete="new-password"
+              />
+              <small id="pwd-help" class="field-help">At least 8 characters. Avoid common phrases.</small>
+              <!-- {{ form.password1.errors }} -->
+            </div>
+
+            <!-- Confirm password -->
+            <div class="field">
+              <label for="id_password2">Confirm password</label>
+              <!-- {{ form.password2 }} -->
+              <input
+                id="id_password2"
+                name="password2"
+                type="password"
+                placeholder="Repeat your password"
+                required
+                minlength="8"
+                aria-required="true"
+                autocomplete="new-password"
+              />
+              <!-- {{ form.password2.errors }} -->
+            </div>
+
+            <!-- Terms/consent -->
+            <div class="row between small-gap">
+              <label class="checkbox">
+                <input type="checkbox" name="agree" id="id_agree" required aria-required="true">
+                <span>I agree to the <a href="#" class="text-link">Terms & Privacy</a></span>
+              </label>
+            </div>
+
+            <button type="submit" class="btn-primary">Create account</button>
+
+            <div class="alt-actions">
+              <p>Already registered? <a href="login.html">Sign in</a></p>
+              <p class="small" style="margin-top:6px;color:var(--muted);font-size:12px;">
+                After signing up, hospital verification may be required for doctor accounts.
+              </p>
+            </div>
+          </form>
+
+          <p class="sr-only" aria-hidden="false">Registration form uses accessible labels and simple validation. No JavaScript required.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <small>© <span id="year">2025</span> Medicare Hub — Secure medical appointments</small>
+  </footer>
+
+  <!-- Integration notes (keep in template, remove if desired):
+       - Replace action="#" with Django URL: action="{% url 'register' %}"
+       - Insert {% csrf_token %} where indicated
+       - Display server-side field errors by populating the per-field error comments (or render Django form fields directly)
+       - For role-specific validation (doctor vs patient), implement logic in backend and surface errors in these placeholders:
+            <!-- {{ form.field_name.errors }} -->
+  -->
+</body>
+</html>

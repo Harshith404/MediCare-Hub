@@ -1,0 +1,411 @@
+<!-- File: templates/profile.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Medicare Hub — Profile</title>
+
+  <!-- shared theme -->
+  <link rel="stylesheet" href="/static/css/style.css">
+
+  <!-- page-specific tweaks -->
+  <style>
+    :root {
+      --profile-gap: 22px;
+      --avatar-size: 110px;
+      --card-padding-lg: 28px;
+    }
+
+    .page-wrap {
+      max-width: var(--max-width);
+      margin: 18px auto;
+      padding: 0 18px 36px;
+    }
+
+    .page-header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:14px;
+    }
+
+    .profile-grid {
+      display:grid;
+      grid-template-columns: 1fr 360px;
+      gap: var(--profile-gap);
+      align-items:start;
+    }
+
+    /* left column (main editable profile) */
+    .card.profile-card {
+      padding: var(--card-padding-lg);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .profile-head {
+      display:flex;
+      gap:18px;
+      align-items:center;
+      margin-bottom:12px;
+    }
+
+    .avatar {
+      width: var(--avatar-size);
+      height: var(--avatar-size);
+      border-radius: 999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: linear-gradient(180deg,#e9fbff,#f0fdfb);
+      border: 4px solid rgba(14,194,182,0.08);
+      overflow:hidden;
+      flex-shrink:0;
+    }
+    .avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+
+    .profile-meta { min-width:0; }
+    .profile-meta h2 { margin:0; font-size:20px; color:var(--accent-deep); }
+    .profile-meta p { margin:6px 0 0 0; color:var(--muted); font-size:13px; }
+
+    .verify-badge {
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:700;
+      background: linear-gradient(90deg,#e6f8f4,#f0fff8);
+      color:#0b6b47;
+      font-size:13px;
+      margin-left:8px;
+    }
+
+    form.profile-form { display:grid; gap:14px; margin-top:12px; }
+    .field-group { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+    .field { display:flex; flex-direction:column; gap:6px; }
+    label { font-size:13px; color:#2a4a50; font-weight:600; }
+
+    input[type="text"], input[type="email"], input[type="tel"], input[type="date"], select, textarea {
+      padding:10px 12px; border-radius:10px; border:1px solid #e6eef0; font-size:14px; background:linear-gradient(180deg,#fff,#fbfeff);
+    }
+    textarea { min-height:90px; resize:vertical; }
+
+    .small-help { font-size:13px; color:var(--muted); }
+
+    .form-actions { display:flex; gap:10px; margin-top:8px; align-items:center; }
+    .btn-secondary { padding:10px 14px; border-radius:10px; border:1px solid rgba(6,50,60,0.06); background:#fff; color:var(--accent-deep); font-weight:700; cursor:pointer; text-decoration:none; display:inline-block; }
+    .btn-danger { padding:10px 14px; border-radius:10px; border:1px solid rgba(178,46,46,0.06); background:transparent; color:#b22e2e; font-weight:700; }
+
+    /* right column (summary / quick actions) */
+    .side-card { padding:20px; border-radius:12px; box-shadow:var(--shadow); background:linear-gradient(180deg,#fff,#fbfeff); }
+    .side-card h3 { margin:0 0 10px 0; color:#0b3440; }
+    .stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:8px 0 12px 0; }
+    .stat-item { background:#fff; padding:10px; border-radius:10px; text-align:center; box-shadow:0 8px 18px rgba(6,50,60,0.04); }
+    .stat-item .num { color:var(--accent-deep); font-weight:800; }
+    .list-compact { list-style:none; padding:0; margin:0; display:grid; gap:10px; }
+    .list-item { display:flex; justify-content:space-between; gap:8px; padding:10px; border-radius:10px; background:linear-gradient(180deg,#fff,#fbfeff); }
+
+    /* change password area */
+    .pw-card { margin-top:14px; padding:16px; border-radius:10px; background:linear-gradient(180deg,#fff,#fbfeff); border:1px solid #eef6f6; }
+    .pw-card h4 { margin:0 0 8px 0; color:#0b3440; font-size:15px; }
+
+    /* responsive */
+    @media (max-width:1000px) {
+      .profile-grid { grid-template-columns: 1fr; }
+      .field-group { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header" role="banner">
+    <div class="site-brand">
+      <svg class="logo-svg" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+        <defs><linearGradient id="g-profile" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#0d6efd"/><stop offset="1" stop-color="#0ec2b6"/></linearGradient></defs>
+        <rect rx="10" width="64" height="64" fill="url(#g-profile)"/>
+        <g transform="translate(10,8)" fill="#fff">
+          <circle cx="11" cy="9" r="3.8"/>
+          <rect x="8" y="18" width="6" height="18" rx="3"/>
+          <path d="M30 10c0 5-8 8-8 8" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </g>
+      </svg>
+      <span class="brand-name">Medicare Hub</span>
+    </div>
+  </header>
+
+  <main class="page-wrap" role="main">
+    <div class="page-header">
+      <div>
+        <h1 style="margin:0;font-size:20px;color:var(--accent-deep)">Profile</h1>
+        <p style="margin:6px 0 0 0;color:var(--muted);font-size:13px;">Manage your account, contact details, and professional profile (if you're a doctor).</p>
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:center;">
+        <a href="patient_dashboard.html" class="btn-ghost">Dashboard</a>
+        <a href="appointments.html" class="btn-primary">My Appointments</a>
+      </div>
+    </div>
+
+    <section class="profile-grid" aria-labelledby="profile-heading">
+
+      <!-- LEFT: editable profile -->
+      <div class="card profile-card" aria-labelledby="profile-heading">
+        <div class="profile-head">
+          <div class="avatar" aria-hidden="true">
+            <!-- show profile image if available -->
+            <!-- Replace src with {{ user.profile.avatar.url }} in Django -->
+            <img src="/static/images/avatar-placeholder.png" alt="Profile photo">
+          </div>
+
+          <div class="profile-meta">
+            <h2 id="profile-heading"><!-- {{ user.get_full_name }} --> Dr. Priya Sharma</h2>
+            <p>
+              <!-- {{ user.email }} --> priya.sharma@hospital.com
+              <!-- show verification status -->
+              <span class="verify-badge" aria-hidden="true">Verified</span>
+              <!-- If not verified, show: <span class="verify-badge" style="background:#fff8f3;color:#b26b00">Unverified</span> -->
+            </p>
+
+            <p class="small-help" style="margin-top:8px;">
+              Member since <!-- {{ user.date_joined|date:"Y" }} --> 2024. Keep your profile details up to date for patient trust.
+            </p>
+          </div>
+        </div>
+
+        <!-- profile update form -->
+        <form method="post" action="#" enctype="multipart/form-data" class="profile-form" novalidate>
+          <!-- csrf_token will come here -->
+
+          <!-- file upload note -->
+          <div class="field">
+            <label for="id_avatar">Profile photo</label>
+            <!-- show current avatar preview; backend should handle upload and storage -->
+            <input id="id_avatar" name="avatar" type="file" accept="image/*" />
+            <small class="small-help">Square image recommended. Backend must handle resize/crop server-side.</small>
+            <!-- {{ form.avatar.errors }} -->
+          </div>
+
+          <div class="field-group">
+            <div class="field">
+              <label for="id_fullname">Full name</label>
+              <input id="id_fullname" name="full_name" type="text" value="<!-- {{ user.get_full_name }} --> Dr. Priya Sharma" required>
+              <!-- {{ form.full_name.errors }} -->
+            </div>
+
+            <div class="field">
+              <label for="id_email">Email</label>
+              <input id="id_email" name="email" type="email" value="<!-- {{ user.email }} --> priya.sharma@hospital.com" required>
+              <small class="small-help">Changing email requires re-verification.</small>
+              <!-- {{ form.email.errors }} -->
+            </div>
+          </div>
+
+          <div class="field-group">
+            <div class="field">
+              <label for="id_phone">Phone</label>
+              <input id="id_phone" name="phone" type="tel" value="<!-- {{ profile.phone }} --> +91 98765 43210">
+              <!-- {{ form.phone.errors }} -->
+            </div>
+
+            <div class="field">
+              <label for="id_dob">Date of birth</label>
+              <input id="id_dob" name="dob" type="date" value="<!-- {{ profile.dob }} -->">
+              <!-- {{ form.dob.errors }} -->
+            </div>
+          </div>
+
+          <div class="field-group">
+            <div class="field">
+              <label for="id_gender">Gender</label>
+              <select id="id_gender" name="gender">
+                <option value="">Prefer not to say</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="id_blood">Blood group</label>
+              <select id="id_blood" name="blood_group">
+                <option value="">Unknown</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- doctor-specific section (conditionally shown for doctors) -->
+          <div class="field" aria-hidden="false">
+            <label for="id_license">Medical license / registration</label>
+            <input id="id_license" name="license_number" type="text" value="<!-- {{ doctor.license_number }} --> ABC123456">
+            <small class="small-help">Displayed after admin verification. Leave blank if not applicable.</small>
+            <!-- {{ form.license_number.errors }} -->
+          </div>
+
+          <div class="field">
+            <label for="id_specialty">Specialization</label>
+            <input id="id_specialty" name="specialty" type="text" value="<!-- {{ doctor.specialty }} --> Cardiology">
+          </div>
+
+          <div class="field">
+            <label for="id_bio">Short bio</label>
+            <textarea id="id_bio" name="bio" placeholder="A short professional summary..."><!-- {{ profile.bio }} --> Experienced cardiologist with focus on patient-first care.</textarea>
+          </div>
+
+          <div class="field">
+            <label for="id_address">Address</label>
+            <input id="id_address" name="address" type="text" value="<!-- {{ profile.address }} --> City Hospital, MG Road, Bangalore">
+            <small class="small-help">Clinic address or home address for contact (visible to admin only if private).</small>
+          </div>
+
+          <!-- emergency contact -->
+          <div class="field-group">
+            <div class="field">
+              <label for="id_emergency_name">Emergency contact name</label>
+              <input id="id_emergency_name" name="emergency_name" type="text" value="<!-- {{ profile.emergency_name }} --> John Doe">
+            </div>
+            <div class="field">
+              <label for="id_emergency_phone">Emergency contact phone</label>
+              <input id="id_emergency_phone" name="emergency_phone" type="tel" value="<!-- {{ profile.emergency_phone }} --> +91 98765 43211">
+            </div>
+          </div>
+
+          <!-- server-side errors area -->
+          <div class="form-error" role="alert" aria-live="assertive" hidden>
+            <!-- {{ form.non_field_errors }} -->
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">Save changes</button>
+            <a href="#" class="btn-secondary" title="Cancel changes">Cancel</a>
+
+            <!-- Deactivate account (admin should confirm / backend must require re-auth) -->
+            <form method="post" action="#" style="display:inline;">
+              <!-- csrf_token -->
+              <input type="hidden" name="action" value="deactivate_account">
+              <button type="submit" class="btn-danger">Deactivate</button>
+            </form>
+          </div>
+        </form>
+
+        <!-- Change password block -->
+        <div class="pw-card" aria-labelledby="pw-title">
+          <h4 id="pw-title">Change password</h4>
+          <form method="post" action="#" novalidate>
+            <!-- csrf_token -->
+            <div class="field">
+              <label for="id_old_password">Current password</label>
+              <input id="id_old_password" name="old_password" type="password" autocomplete="current-password">
+            </div>
+            <div class="field">
+              <label for="id_new_password1">New password</label>
+              <input id="id_new_password1" name="new_password1" type="password" autocomplete="new-password">
+            </div>
+            <div class="field">
+              <label for="id_new_password2">Confirm new password</label>
+              <input id="id_new_password2" name="new_password2" type="password" autocomplete="new-password">
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:8px;">
+              <button type="submit" class="btn-primary">Update password</button>
+              <a href="#" class="btn-secondary">Forgot password?</a>
+            </div>
+
+            <div class="small-help" style="margin-top:8px;">
+              Use a strong password (at least 8 characters). Password checks are done on server-side.
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- RIGHT: quick stats, upcoming appointments, recent visits -->
+      <aside>
+        <div class="side-card" aria-labelledby="account-quick">
+          <h3 id="account-quick">Quick summary</h3>
+
+          <div class="stat-grid" role="list" aria-hidden="false">
+            <div class="stat-item" role="listitem">
+              <div class="num"><!-- {{ upcoming_appointments_count }} --> 2</div>
+              <div class="small-help">Upcoming</div>
+            </div>
+            <div class="stat-item" role="listitem">
+              <div class="num"><!-- {{ past_visits_count }} --> 8</div>
+              <div class="small-help">Past visits</div>
+            </div>
+          </div>
+
+          <h4 style="margin:10px 0 8px 0;color:#0b3440;font-size:15px;">Upcoming appointments</h4>
+          <ul class="list-compact" aria-live="polite">
+            <!-- replace with Django loop over upcoming_appointments -->
+            <li class="list-item">
+              <div>
+                <div style="font-weight:700;color:#07333a;">Dr. Priya Sharma</div>
+                <div style="font-size:13px;color:var(--muted);">Tue, 12 Aug 2025 — 10:30</div>
+              </div>
+              <div style="align-self:center;">
+                <span class="status-pill status-confirmed">Confirmed</span>
+              </div>
+            </li>
+
+            <li class="list-item">
+              <div>
+                <div style="font-weight:700;color:#07333a;">Dr. Rohit Kumar</div>
+                <div style="font-size:13px;color:var(--muted);">Fri, 22 Aug 2025 — 02:00</div>
+              </div>
+              <div style="align-self:center;">
+                <span class="status-pill status-pending">Pending</span>
+              </div>
+            </li>
+          </ul>
+
+          <hr style="margin:14px 0;border:none;border-top:1px solid #f1fbfb">
+
+          <h4 style="margin:0 0 8px 0;color:#0b3440;font-size:15px;">Recent visits</h4>
+          <ul class="list-compact" style="margin-top:8px;">
+            <li class="list-item">
+              <div>Dental check — Dr. K. Patel</div>
+              <div style="font-size:13px;color:var(--muted);">12 Jul 2025</div>
+            </li>
+            <li class="list-item">
+              <div>General consult — Dr. Rohit</div>
+              <div style="font-size:13px;color:var(--muted);">28 Jun 2025</div>
+            </li>
+          </ul>
+
+          <hr style="margin:14px 0;border:none;border-top:1px solid #f1fbfb">
+
+          <div style="display:flex;gap:8px;">
+            <a href="appointments.html" class="btn-ghost" style="flex:1;text-align:center;">View Appointments</a>
+            <a href="book_appointment.html" class="btn-primary" style="flex:1;text-align:center;">Book</a>
+          </div>
+        </div>
+      </aside>
+
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <small>© <span id="year">2025</span> Medicare Hub — Secure medical appointments</small>
+  </footer>
+
+  <!-- Integration notes:
+       - Replace action="#" with proper Django view URL endpoints:
+           * Profile update: action="{% url 'profile_update' %}"
+           * Avatar upload: handled by Django storage; ensure enctype="multipart/form-data"
+           * Password change: use Django's password change view or custom handler
+           * Insert {% csrf_token %} in every POST form
+       - Pre-fill inputs with Django values (examples shown inside comments)
+       - Conditionally show doctor-specific fields using {% if user.is_doctor %} ... {% endif %}
+       - For image preview, return the stored image URL and use it in <img src="{{ user.profile.avatar.url }}">
+       - Server-side should validate and sanitize file uploads and input fields
+  -->
+</body>
+</html>

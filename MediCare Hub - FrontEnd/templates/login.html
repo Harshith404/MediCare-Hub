@@ -1,0 +1,162 @@
+<!-- File: templates/login.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Medicare Hub — Login</title>
+
+  <!-- favicon placeholder (replace with /static/images/favicon.ico) -->
+  <!-- <link rel="icon" href="{% static 'images/favicon.ico' %}"> -->
+
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <header class="site-header" role="banner" aria-hidden="false">
+    <div class="site-brand">
+      <!-- Replace with your logo: /static/images/logo.png -->
+      <!-- <img src="/static/images/logo.png" alt="Medicare Hub"> -->
+      <!-- Inline lightweight symbol as fallback / placeholder -->
+      <svg class="logo-svg" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#0d6efd"/>
+            <stop offset="1" stop-color="#0ec2b6"/>
+          </linearGradient>
+        </defs>
+        <rect rx="10" width="64" height="64" fill="url(#g)"/>
+        <g transform="translate(10,8)" fill="#fff">
+          <circle cx="11" cy="9" r="3.8"/>
+          <rect x="8" y="18" width="6" height="18" rx="3"/>
+          <path d="M30 10c0 5-8 8-8 8" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </g>
+      </svg>
+
+      <span class="brand-name">Medicare Hub</span>
+    </div>
+  </header>
+
+  <main class="auth-page" role="main">
+    <section class="auth-card" aria-labelledby="signin-title">
+      <!-- Left panel: Branding & Illustration -->
+      <div class="auth-left">
+        <div class="left-inner">
+          <h1 class="welcome">Welcome back, Doctor</h1>
+          <p class="lead">Manage patients • View appointments • Provide care</p>
+
+          <!-- Decorative illustration (pure CSS + SVG) -->
+          <figure class="illustration" aria-hidden="true">
+            <svg viewBox="0 0 220 220" class="illu-svg" focusable="false">
+              <!-- soft circle -->
+              <defs>
+                <radialGradient id="rg" cx="30%" cy="30%">
+                  <stop offset="0%" stop-color="#e8fbff"/>
+                  <stop offset="100%" stop-color="#d9f6f2"/>
+                </radialGradient>
+              </defs>
+              <circle cx="110" cy="110" r="110" fill="url(#rg)"/>
+              <!-- stethoscope simplified -->
+              <g transform="translate(40,38)" fill="none" stroke="#0b7285" stroke-linecap="round" stroke-linejoin="round" stroke-width="6">
+                <path d="M64 14 C64 40, 24 40, 24 66" />
+                <path d="M24 66 C20 98, 40 110, 64 110 C88 110, 108 98, 104 66" />
+                <circle cx="64" cy="20" r="10" fill="#0b7285"/>
+                <rect x="88" y="82" width="20" height="28" rx="6" fill="#0b7285"/>
+              </g>
+            </svg>
+          </figure>
+
+          <ul class="left-features">
+            <li>Encrypted records</li>
+            <li>Quick appointment management</li>
+            <li>Secure patient communication</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Right panel: Login form -->
+      <div class="auth-right">
+        <div class="form-wrap">
+          <h2 id="signin-title">Doctor Sign In</h2>
+
+          <!-- Non-field error area (Django) -->
+          <div class="form-error" role="alert" aria-live="polite" hidden>
+            <!-- {{ form.non_field_errors }} -->
+          </div>
+
+          <form method="post" action="#" class="login-form" autocomplete="on" novalidate>
+            <!-- Django will inject CSRF token here -->
+            <!-- csrf_token will come here -->
+
+            <!-- Username / Email -->
+            <div class="field">
+              <label for="id_username">Email or username</label>
+              <!-- {{ form.username }} -->
+              <input
+                id="id_username"
+                name="username"
+                type="text"
+                autocomplete="username"
+                placeholder="you@hospital.com"
+                required
+                maxlength="150"
+                aria-required="true"
+                aria-describedby="username-help"
+                autofocus
+              />
+              <small id="username-help" class="field-help">Use the email registered with the hospital</small>
+              <!-- value attribute will be filled by Django: <!-- {{ form.username.value }} --> -->
+            </div>
+
+            <!-- Password -->
+            <div class="field">
+              <label for="id_password">Password</label>
+              <!-- {{ form.password }} -->
+              <input
+                id="id_password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                placeholder="Enter your password"
+                required
+                aria-required="true"
+              />
+              <small class="field-help">Minimum 8 characters</small>
+            </div>
+
+            <!-- Remember / options -->
+            <div class="row between small-gap">
+              <label class="checkbox">
+                <input type="checkbox" name="remember" id="id_remember" />
+                <span>Remember me</span>
+              </label>
+
+              <a href="#" class="text-link small">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn-primary">Sign in</button>
+
+            <div class="alt-actions">
+              <p>Not a member? <a href="register.html">Create an account</a></p>
+              <!-- If you want role-specific login hint:
+                   <!-- <p class="hint">You are signing in as a doctor — for patient login use patient portal</p> -->
+            </div>
+          </form>
+
+          <!-- Small accessibility helper -->
+          <p class="sr-only" aria-hidden="false">This form uses accessible labels and simple HTML validation. No JavaScript required.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" role="contentinfo" aria-hidden="false">
+    <small>© <span id="year">2025</span> Medicare Hub — Secure medical appointments</small>
+  </footer>
+
+  <!-- Notes for integration (do not remove): 
+       - Replace form action with Django url: action="{% url 'login' %}"
+       - Insert {% csrf_token %} where comment indicates
+       - Show server-side errors by populating .form-error and removing "hidden" attribute
+  -->
+</body>
+</html>

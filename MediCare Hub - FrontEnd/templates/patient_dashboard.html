@@ -1,0 +1,413 @@
+<!-- File: templates/patient_dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Medicare Hub — Patient Dashboard</title>
+
+  <!-- favicon placeholder -->
+  <!-- <link rel="icon" href="{% static 'images/favicon.ico' %}"> -->
+
+  <link rel="stylesheet" href="/static/css/style.css">
+
+  <!-- small page-specific styles (keeps overall theme consistent with style.css) -->
+  <style>
+    :root {
+      --dash-gap: 22px;
+      --card-padding: 20px;
+      --muted-2: #6f8b90;
+    }
+
+    .dashboard-wrap {
+      max-width: var(--max-width);
+      margin: 18px auto;
+      padding: 0 18px;
+    }
+
+    .top-nav {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding: 12px 0;
+      gap:12px;
+    }
+
+    .nav-links { display:flex; gap:12px; align-items:center; }
+    .nav-links a { color: var(--accent-deep); text-decoration:none; font-weight:600; padding:8px 12px; border-radius:8px; }
+    .nav-links a.active { background: rgba(13,110,253,0.08); }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 300px 1fr 300px;
+      gap: var(--dash-gap);
+      align-items: start;
+      margin-top: 12px;
+    }
+
+    /* Generic card used across dashboard */
+    .card {
+      background: var(--card-bg);
+      padding: var(--card-padding);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .profile-card { text-align:center; padding-top:28px; }
+    .avatar {
+      width:92px;
+      height:92px;
+      border-radius: 999px;
+      display:inline-block;
+      background: linear-gradient(180deg,#e9fbff,#f0fdfb);
+      border: 4px solid rgba(14,194,182,0.08);
+      margin-bottom:12px;
+      align-items:center;
+      justify-content:center;
+      display:flex;
+    }
+    .avatar svg { width:56px; height:56px; fill:var(--accent-deep); }
+
+    .profile-name { font-size:18px; font-weight:700; color:#0b3440; margin-bottom:4px; }
+    .profile-meta { font-size:13px; color:var(--muted); margin-bottom:10px; }
+
+    .stat-row { display:flex; gap:10px; justify-content:center; margin-top:10px; }
+    .stat {
+      background: linear-gradient(180deg, rgba(13,110,253,0.04), rgba(14,194,182,0.02));
+      padding:8px 12px;
+      border-radius:10px;
+      font-weight:700;
+      color:var(--accent-deep);
+      font-size:13px;
+      min-width:86px;
+      text-align:center;
+    }
+
+    /* Main content */
+    .main-header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:12px;
+    }
+    .main-header h2 { margin:0; font-size:20px; color:var(--accent-deep); }
+    .actions { display:flex; gap:10px; align-items:center; }
+
+    .btn-secondary {
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid rgba(255,80,80,0.14);
+      background: #fff;
+      color:#b32525;
+      font-weight:700;
+      cursor:pointer;
+    }
+    .btn-ghost {
+      padding:8px 10px;
+      border-radius:10px;
+      background:transparent;
+      border:1px dashed rgba(6,50,60,0.06);
+      font-weight:600;
+      color:var(--accent-deep);
+    }
+
+    /* Appointments table */
+    .table { width:100%; border-collapse:collapse; margin-top:8px; }
+    .table thead th {
+      text-align:left;
+      padding:12px 10px;
+      font-size:13px;
+      color:var(--muted);
+      border-bottom: 1px solid #eef6f6;
+    }
+    .table tbody tr { transition: background .14s ease; }
+    .table tbody tr:hover { background: rgba(13,110,253,0.03); }
+    .table td { padding:14px 10px; vertical-align:middle; font-size:14px; color:#0f2f33; border-bottom: 1px solid #fafdfd; }
+
+    .status-pill {
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:700;
+    }
+    .status-confirmed { background: rgba(14,194,182,0.12); color:var(--accent-deep); }
+    .status-pending { background: rgba(13,110,253,0.08); color: var(--accent-deep); }
+    .status-cancelled { background: rgba(255, 90, 90, 0.08); color:#b22e2e; }
+
+    .row-actions { display:flex; gap:8px; align-items:center; }
+    .action-btn { padding:8px 10px; border-radius:8px; font-weight:700; border:none; cursor:pointer; }
+    .action-btn.view { background: transparent; color: var(--accent-deep); border:1px solid rgba(13,110,253,0.06); }
+    .action-btn.cancel { background: transparent; color:#b22e2e; border:1px solid rgba(178,46,46,0.06); }
+
+    /* Right column small cards */
+    .doctors-card ul { list-style:none; padding:0; margin:8px 0 0 0; display:grid; gap:10px; }
+    .doctor-item { display:flex; gap:10px; align-items:center; padding:8px; border-radius:8px; background: linear-gradient(180deg,#fff,#fbfefe); }
+    .doctor-item img { width:44px; height:44px; border-radius:8px; object-fit:cover; }
+    .doctor-item .meta { font-size:13px; }
+    .doctor-item .meta .name { font-weight:700; color:#07333a; }
+    .doctor-item .meta .specialty { color:var(--muted); font-size:12px; }
+
+    /* small screen */
+    @media (max-width: 1000px){
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .top-nav { flex-direction: column; align-items:flex-start; gap:8px; }
+      .nav-links a { padding:6px 8px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header" role="banner">
+    <div class="site-brand">
+      <!-- Logo placeholder -->
+      <!-- <img src="/static/images/logo.png" alt="Medicare Hub"> -->
+      <svg class="logo-svg" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="g3" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#0d6efd"/>
+            <stop offset="1" stop-color="#0ec2b6"/>
+          </linearGradient>
+        </defs>
+        <rect rx="10" width="64" height="64" fill="url(#g3)"/>
+        <g transform="translate(10,8)" fill="#fff">
+          <circle cx="11" cy="9" r="3.8"/>
+          <rect x="8" y="18" width="6" height="18" rx="3"/>
+          <path d="M30 10c0 5-8 8-8 8" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </g>
+      </svg>
+      <span class="brand-name">Medicare Hub</span>
+    </div>
+  </header>
+
+  <main class="dashboard-wrap" role="main">
+    <div class="top-nav">
+      <div>
+        <h1 style="font-size:18px;margin:0;color:var(--accent-deep)">Patient Dashboard</h1>
+        <p style="margin:4px 0 0 0;color:var(--muted);font-size:13px;">Quick view of your appointments & care team</p>
+      </div>
+
+      <div class="nav-links" role="navigation" aria-label="Dashboard navigation">
+        <a href="patient_dashboard.html" class="active">Overview</a>
+        <a href="appointments.html">Appointments</a>
+        <a href="profile.html">Profile</a>
+        <!-- Replace the logout link with Django reverse when integrating -->
+        <!-- <a href="{% url 'logout' %}">Logout</a> -->
+        <a href="#" class="btn-ghost" title="Logout (replace link with {% url 'logout' %})">Logout</a>
+      </div>
+    </div>
+
+    <section class="dashboard-grid" aria-label="Main dashboard grid">
+
+      <!-- LEFT: Profile & quick stats -->
+      <aside class="card profile-card" aria-labelledby="profile-title">
+        <div class="avatar" aria-hidden="true">
+          <!-- avatar placeholder -->
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 12c2.8 0 5-2.2 5-5s-2.2-5-5-5-5 2.2-5 5 2.2 5 5 5zm0 2c-3.3 0-10 1.7-10 5v1h20v-1c0-3.3-6.7-5-10-5z"/></svg>
+        </div>
+
+        <!-- patient_name will come here -->
+        <div id="profile-title">
+          <div class="profile-name"><!-- {{ patient.full_name }} --> Dr. John Doe (Example)</div>
+          <div class="profile-meta"><!-- {{ patient.email }} --> john.doe@example.com</div>
+        </div>
+
+        <div class="stat-row" role="list" aria-hidden="false">
+          <div class="stat" role="listitem">
+            <!-- upcoming_count will come here --> 2 upcoming
+            <!-- {{ upcoming_appointments_count }} -->
+          </div>
+          <div class="stat" role="listitem">
+            <!-- past_count will come here --> 5 past
+            <!-- {{ past_appointments_count }} -->
+          </div>
+        </div>
+
+        <div style="margin-top:14px;">
+          <a href="book_appointment.html" class="btn-primary" style="display:block;text-align:center;">Book Appointment</a>
+        </div>
+
+        <hr style="margin:16px 0;border:none;border-top:1px solid #f1fbfb">
+
+        <div style="text-align:left;">
+          <h4 style="margin:0 0 6px 0;color:#0b3440;font-size:14px;">Next appointment</h4>
+
+          <div style="background:linear-gradient(180deg,#fff,#fbfffe); padding:12px;border-radius:10px;box-shadow:0 8px 20px rgba(5,35,40,0.04);">
+            <div style="font-weight:700;color:#0b3440;">Dr. Priya Sharma</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:4px;">Tue, 12 Aug 2025 — 10:30 AM</div>
+            <!-- The data above should come from the next_up_appointment variable: -->
+            <!-- {{ next_up_appointment.doctor }}, {{ next_up_appointment.date }}, {{ next_up_appointment.time }} -->
+          </div>
+        </div>
+      </aside>
+
+      <!-- CENTER: Appointments list & actions -->
+      <section class="card" aria-labelledby="main-appointments">
+        <div class="main-header">
+          <div>
+            <h2 id="main-appointments">Upcoming appointments</h2>
+            <p style="margin:6px 0 0 0;color:var(--muted);font-size:13px;">Manage or cancel upcoming visits</p>
+          </div>
+
+          <div class="actions" role="toolbar" aria-label="Quick actions">
+            <label for="filter-doctor" class="sr-only">Filter by doctor</label>
+            <select id="filter-doctor" name="filter_doctor" aria-label="Filter by doctor">
+              <option value="">All doctors</option>
+              <option value="priya">Dr. Priya Sharma</option>
+              <option value="rohit">Dr. Rohit Kumar</option>
+              <!-- Replace this select with dynamic doctor list from backend -->
+              <!-- {% for d in doctors %} <option value="{{ d.id }}">{{ d.name }}</option> {% endfor %} -->
+            </select>
+
+            <a href="book_appointment.html" class="btn-ghost" title="Book new appointment">New</a>
+          </div>
+        </div>
+
+        <!-- Appointments table -->
+        <div style="overflow:auto;">
+          <table class="table" role="table" aria-describedby="main-appointments">
+            <thead>
+              <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Time</th>
+                <th scope="col">Doctor</th>
+                <th scope="col">Status</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <!-- Static sample rows. Replace with Django loop when integrating. -->
+              <!-- upcoming_appointments loop will go here:
+                   {% for appt in upcoming_appointments %}
+                     <tr> ... </tr>
+                   {% empty %}
+                     <tr><td colspan="5">No upcoming appointments.</td></tr>
+                   {% endfor %}
+              -->
+
+              <tr>
+                <td>Tue, 12 Aug 2025</td>
+                <td>10:30 AM</td>
+                <td>Dr. Priya Sharma — Cardiology</td>
+                <td><span class="status-pill status-confirmed">Confirmed</span></td>
+                <td>
+                  <div class="row-actions">
+                    <!-- View details -->
+                    <a class="action-btn view" href="#" title="View appointment details">View</a>
+
+                    <!-- Cancel form (server should handle CSRF and cancellation) -->
+                    <form method="post" action="#" style="display:inline;">
+                      <!-- csrf_token will come here -->
+                      <!-- Example cancel endpoint (replace with Django URL): -->
+                      <!-- action="{% url 'cancel_appointment' appt.id %}" -->
+                      <input type="hidden" name="appointment_id" value="123">
+                      <button type="submit" class="action-btn cancel">Cancel</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td>Fri, 22 Aug 2025</td>
+                <td>02:00 PM</td>
+                <td>Dr. Rohit Kumar — General Medicine</td>
+                <td><span class="status-pill status-pending">Pending</span></td>
+                <td>
+                  <div class="row-actions">
+                    <a class="action-btn view" href="#">View</a>
+                    <form method="post" action="#" style="display:inline;">
+                      <!-- csrf_token will come here -->
+                      <input type="hidden" name="appointment_id" value="124">
+                      <button type="submit" class="action-btn cancel">Cancel</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Example when no appointments:
+                <tr>
+                  <td colspan="5" style="padding:20px;text-align:center;color:var(--muted);">
+                    No upcoming appointments. <a href="book_appointment.html">Book one now</a>.
+                  </td>
+                </tr>
+              -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Past appointments quick list -->
+        <hr style="margin:20px 0;border:none;border-top:1px solid #f1fbfb">
+        <h3 style="margin:0 0 10px 0;color:#0b3440;font-size:16px;">Recent visits</h3>
+
+        <ul style="list-style:none;padding:0;margin:10px 0 0 0;display:grid;gap:10px;">
+          <!-- Replace with Django loop: {% for visit in recent_visits %} -->
+          <li style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;background:linear-gradient(180deg,#fff,#fbfeff);">
+            <div>
+              <div style="font-weight:700;color:#07333a;">Dental check — Dr. K. Patel</div>
+              <div style="font-size:13px;color:var(--muted);">12 Jul 2025 • Follow-up: None</div>
+            </div>
+            <div style="font-size:13px;color:var(--muted);">Notes</div>
+          </li>
+
+          <li style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;background:linear-gradient(180deg,#fff,#fbfeff);">
+            <div>
+              <div style="font-weight:700;color:#07333a;">General consult — Dr. Rohit Kumar</div>
+              <div style="font-size:13px;color:var(--muted);">28 Jun 2025 • Prescription issued</div>
+            </div>
+            <div style="font-size:13px;color:var(--muted);">Notes</div>
+          </li>
+        </ul>
+      </section>
+
+      <!-- RIGHT: Doctors list & quick info -->
+      <aside class="card doctors-card" aria-labelledby="doctors-title">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <h3 id="doctors-title" style="margin:0;color:#0b3440">Your doctors</h3>
+          <a href="appointments.html" class="text-link small">All</a>
+        </div>
+
+        <ul aria-hidden="false">
+          <!-- Replace with Django list: {% for doc in my_doctors %} -->
+          <li class="doctor-item">
+            <img src="/static/images/doc1.jpg" alt="Dr. Priya" onerror="this.style.display='none'">
+            <div class="meta">
+              <div class="name">Dr. Priya Sharma</div>
+              <div class="specialty">Cardiologist • City Hospital</div>
+            </div>
+          </li>
+
+          <li class="doctor-item">
+            <img src="/static/images/doc2.jpg" alt="Dr. Rohit" onerror="this.style.display='none'">
+            <div class="meta">
+              <div class="name">Dr. Rohit Kumar</div>
+              <div class="specialty">General Physician • Clinic 24x7</div>
+            </div>
+          </li>
+        </ul>
+
+        <hr style="margin:14px 0;border:none;border-top:1px solid #f1fbfb">
+
+        <h4 style="margin:0 0 8px 0;color:#0b3440;font-size:14px;">Quick tips</h4>
+        <p style="margin:0;color:var(--muted);font-size:13px;">
+          Bring previous test reports to appointments. For doctor verification and secure messaging, enable profile verification in the Profile page.
+        </p>
+      </aside>
+    </section>
+  </main>
+
+  <footer class="site-footer" role="contentinfo" aria-hidden="false">
+    <small>© <span id="year">2025</span> Medicare Hub — Secure medical appointments</small>
+  </footer>
+
+  <!-- Integration notes (keep or copy to backend task list):
+       - Replace static content with Django variables/loops:
+           * patient name/email:  {{ patient.full_name }} 
+           * upcoming_appointments: loop over upcoming_appointments queryset
+           * use {% csrf_token %} inside each cancel form
+           * link "Book Appointment" to Django view: action="{% url 'book_appointment' %}"
+       - Make sure cancel endpoint checks user permissions and appointment ownership.
+       - Consider rendering appointment rows with a template include, e.g. {% include 'partials/appointment_row.html' %}
+  -->
+</body>
+</html>

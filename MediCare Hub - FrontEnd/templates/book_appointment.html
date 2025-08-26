@@ -1,0 +1,275 @@
+<!-- File: templates/book_appointment.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Medicare Hub — Book Appointment</title>
+
+  <!-- Shared theme CSS -->
+  <link rel="stylesheet" href="/static/css/style.css">
+
+  <!-- Page-specific styles (keeps visual harmony with style.css) -->
+  <style>
+    :root {
+      --card-gap: 22px;
+      --form-width: 520px;
+    }
+
+    .page-wrap {
+      max-width: var(--max-width);
+      margin: 18px auto;
+      padding: 0 18px 36px;
+    }
+
+    .page-header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:12px;
+    }
+
+    .layout {
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap: var(--card-gap);
+      align-items: start;
+    }
+
+    /* Main form card */
+    .card.form-card { padding: 28px; border-radius: 12px; box-shadow: var(--shadow); }
+    .form-grid { display:grid; gap:14px; max-width:var(--form-width); }
+
+    label { display:block; font-size:13px; color:#234a4f; margin-bottom:6px; font-weight:600; }
+
+    input[type="date"], input[type="time"], select, textarea, input[type="text"] {
+      width:100%;
+      padding:12px 14px;
+      border-radius:10px;
+      border:1px solid #e6eef0;
+      background: linear-gradient(180deg,#fff,#fbfeff);
+      font-size:14px;
+      color:#0b3440;
+    }
+
+    textarea { min-height:120px; resize:vertical; }
+
+    .row { display:flex; gap:12px; }
+    .row .col { flex:1; }
+
+    .small-help { font-size:13px; color:var(--muted); margin-top:6px; }
+
+    .summary-card { padding:20px; border-radius:12px; box-shadow: var(--shadow); background: linear-gradient(180deg,#fff,#fbfeff); }
+
+    .slot-list { display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; margin-top:10px; }
+    .slot {
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid #e7f4f3;
+      background: #fff;
+      font-weight:700;
+      font-size:13px;
+      color:var(--accent-deep);
+      text-align:center;
+    }
+
+    .btn-row { display:flex; gap:10px; margin-top:6px; align-items:center; }
+    .btn-cancel { padding:10px 12px; border-radius:10px; background:transparent; border:1px solid rgba(6,50,60,0.06); color:var(--accent-deep); font-weight:700; }
+    .btn-submit { padding:12px 16px; border-radius:10px; border:none; background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%); color:#fff; font-weight:800; cursor:pointer; }
+
+    /* form error/success */
+    .form-error, .form-success {
+      padding:10px 12px;
+      border-radius:8px;
+      font-size:14px;
+      margin-bottom:8px;
+    }
+    .form-error { background:#fff2f0; color:#a3322b; border:1px solid #ffd6d0; }
+    .form-success { background:#f0fff6; color:#0a6b46; border:1px solid #bdf1dc; }
+
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      .slot-list { grid-template-columns: repeat(3, 1fr); }
+      .form-grid { max-width:100%; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header" role="banner">
+    <div class="site-brand">
+      <svg class="logo-svg" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+        <defs><linearGradient id="g-book" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#0d6efd"/><stop offset="1" stop-color="#0ec2b6"/></linearGradient></defs>
+        <rect rx="10" width="64" height="64" fill="url(#g-book)"/>
+        <g transform="translate(10,8)" fill="#fff">
+          <circle cx="11" cy="9" r="3.8"/>
+          <rect x="8" y="18" width="6" height="18" rx="3"/>
+          <path d="M30 10c0 5-8 8-8 8" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </g>
+      </svg>
+      <span class="brand-name">Medicare Hub</span>
+    </div>
+  </header>
+
+  <main class="page-wrap" role="main">
+    <div class="page-header">
+      <div>
+        <h1 style="margin:0;font-size:20px;color:var(--accent-deep)">Book an Appointment</h1>
+        <p style="margin:6px 0 0 0;color:var(--muted);font-size:13px;">Choose a date, time and doctor. We’ll confirm availability.</p>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center;">
+        <a href="patient_dashboard.html" class="btn-ghost">Back to Dashboard</a>
+      </div>
+    </div>
+
+    <section class="layout" aria-labelledby="book-form">
+
+      <!-- LEFT: Booking form -->
+      <div class="card form-card" aria-labelledby="book-form">
+        <h2 id="book-form" style="margin:0 0 8px 0;color:#0b3440">Appointment details</h2>
+        <p class="small-help" style="margin:0 0 12px 0;">Fill the form below to request a slot. The system or doctor will confirm or suggest alternatives.</p>
+
+        <!-- Success / Error placeholders -->
+        <div class="form-success" role="status" aria-live="polite" hidden>
+          <!-- {{ success_message }} -->
+          <!-- Example: Appointment requested successfully. -->
+        </div>
+        <div class="form-error" role="alert" aria-live="assertive" hidden>
+          <!-- {{ form.non_field_errors }} -->
+        </div>
+
+        <form method="post" action="#" class="form-grid" novalidate>
+          <!-- csrf_token will come here -->
+
+          <!-- Patient (optional: if admin/doctor booking, patient select appears) -->
+          <div>
+            <label for="id_patient">Patient</label>
+            <!-- If integrating with Django forms you can render a choice field here:
+                 {{ form.patient }} -->
+            <input id="id_patient" name="patient" type="text" placeholder="Your full name" value="" autocomplete="name">
+            <small class="small-help">If booking for someone else, enter their name.</small>
+            <!-- {{ form.patient.errors }} -->
+          </div>
+
+          <!-- Doctor select -->
+          <div>
+            <label for="id_doctor">Doctor</label>
+            <select id="id_doctor" name="doctor" required aria-required="true">
+              <option value="">Select a doctor</option>
+              <!-- Replace with backend list: 
+                   {% for doc in doctors %}
+                     <option value="{{ doc.id }}">{{ doc.full_name }} — {{ doc.specialty }}</option>
+                   {% endfor %} -->
+              <option value="1">Dr. Priya Sharma — Cardiology</option>
+              <option value="2">Dr. Rohit Kumar — General Medicine</option>
+              <option value="3">Dr. Asha Rao — Pediatrics</option>
+            </select>
+            <!-- {{ form.doctor.errors }} -->
+          </div>
+
+          <!-- Date + Time -->
+          <div class="row">
+            <div class="col">
+              <label for="id_date">Date</label>
+              <input id="id_date" name="date" type="date" required aria-required="true" />
+              <!-- {{ form.date.errors }} -->
+            </div>
+
+            <div class="col">
+              <label for="id_time">Time</label>
+              <input id="id_time" name="time" type="time" required aria-required="true" />
+              <!-- {{ form.time.errors }} -->
+            </div>
+          </div>
+
+          <!-- Reason & Notes -->
+          <div>
+            <label for="id_reason">Reason for visit</label>
+            <input id="id_reason" name="reason" type="text" placeholder="e.g., follow-up, consultation" maxlength="120" />
+            <small class="small-help">Short summary to help the doctor prepare.</small>
+          </div>
+
+          <div>
+            <label for="id_notes">Additional notes</label>
+            <textarea id="id_notes" name="notes" placeholder="Any extra details or concerns (allergies, prior tests)"></textarea>
+          </div>
+
+          <!-- Optional: Teleconsult / In-person toggle (simple accessible select) -->
+          <div>
+            <label for="id_mode">Mode</label>
+            <select id="id_mode" name="mode" aria-required="true">
+              <option value="in_person">In-person</option>
+              <option value="teleconsult">Teleconsult (video)</option>
+            </select>
+          </div>
+
+          <!-- Submit area -->
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px;">
+            <div class="btn-row">
+              <button type="submit" class="btn-submit">Request Appointment</button>
+              <a href="appointments.html" class="btn-cancel" role="button">View my appointments</a>
+            </div>
+
+            <small class="small-help">You will receive email/SMS when the appointment is confirmed. Admin or doctor may reschedule if needed.</small>
+          </div>
+        </form>
+      </div>
+
+      <!-- RIGHT: Summary & available slots -->
+      <aside>
+        <div class="summary-card">
+          <h3 style="margin:0 0 6px 0;color:#0b3440">Doctor availability</h3>
+          <p class="small-help" style="margin:0 0 12px 0;">Pick a preferred date/time or choose from suggested slots below.</p>
+
+          <!-- Suggested slots (static samples) -->
+          <div aria-live="polite">
+            <!-- When integrating, generate suggested_slots from backend:
+                 {% for slot in suggested_slots %}
+                   <div class="slot">{{ slot.date }} • {{ slot.time }}</div>
+                 {% endfor %}
+            -->
+            <div class="slot-list" role="list" aria-label="Suggested slots">
+              <div class="slot" role="listitem">12 Aug 2025 • 10:30</div>
+              <div class="slot" role="listitem">12 Aug 2025 • 11:30</div>
+              <div class="slot" role="listitem">13 Aug 2025 • 09:00</div>
+              <div class="slot" role="listitem">13 Aug 2025 • 14:00</div>
+            </div>
+          </div>
+
+          <hr style="margin:14px 0;border:none;border-top:1px solid #f1fbfb">
+
+          <h4 style="margin:0 0 6px 0;color:#0b3440">What to bring</h4>
+          <ul style="margin:8px 0 0 18px;color:var(--muted);font-size:14px;">
+            <li>Previous reports / prescriptions</li>
+            <li>List of current medicines</li>
+            <li>Photo ID for verification</li>
+          </ul>
+
+          <hr style="margin:14px 0;border:none;border-top:1px solid #f1fbfb">
+
+          <p class="small-help" style="margin:0;">Need help? Contact support at <a href="mailto:support@medicarehub.example" class="text-link">support@medicarehub.example</a></p>
+        </div>
+      </aside>
+
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <small>© <span id="year">2025</span> Medicare Hub — Secure medical appointments</small>
+  </footer>
+
+  <!-- Integration notes:
+       - Replace action="#" with Django URL for booking (e.g. action="{% url 'book_appointment' %}")
+       - Insert {% csrf_token %} where indicated
+       - Populate doctor list & suggested slots from backend:
+           * doctors: iterate and render <option value="{{ doc.id }}">{{ doc.full_name }} — {{ doc.specialty }}</option>
+           * suggested_slots: render each suggested slot (date/time) as shown
+       - On server validation, show errors by removing 'hidden' and filling .form-error with {{ form.field.errors }}
+       - For patient-specific booking, pre-fill patient name/email using Django variables:
+           <!-- {{ user.get_full_name }} or {{ patient.full_name }} -->
+       - Consider server-side validation for date/time (no client JS).
+  -->
+</body>
+</html>
